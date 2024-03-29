@@ -152,7 +152,7 @@ class Main extends Controller
 
     public function login_with_username(Request $request){
         $validator = Validator::make($request->all(), [
-            'username' => 'required',
+            'phone' => 'required',
             'password' => 'required',
         ]);
 
@@ -163,7 +163,7 @@ class Main extends Controller
             ], 401); // Unprocessable Entity
         }
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('phone', $request->phone)->first();
 
         if (!$user) {
             return response()->json([
@@ -185,8 +185,10 @@ class Main extends Controller
                 'message' => 'Your account is blocked by admin!',
             ], 401); // Forbidden
         }
+        $credentials['username'] = $user->username;
+        $credentials['password'] = $request->password;
 
-        if (!Auth::attempt($request->only('username', 'password'))) {
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Login details are not valid!',

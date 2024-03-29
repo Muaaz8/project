@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\User\Products;
 
 Route::post('/signup', [Main::class,'signup']);
 Route::post('/login-email', [Main::class,'login_with_email']);
-Route::post('/login-username', [Main::class,'login_with_username']);
+Route::post('/login-phone', [Main::class,'login_with_username']);
 
 Route::post('/forgot-password', [Main::class,'forgot_pass_p']);
 Route::post('/otp-verify', [Main::class,'reset_code']);
