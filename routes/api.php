@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\Main;
 use App\Http\Controllers\Api\User\Category;
 use App\Http\Controllers\Api\User\Products;
+use App\Http\Controllers\Api\User\WishlistController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,3 +35,11 @@ Route::post('/add-product-second-step', [Products::class,'second_step']);
 Route::post('/add-product-third-step', [Products::class,'third_step']);
 Route::post('/add-product-last-step', [Products::class,'last_step']);
 Route::post('/upload-image', [Products::class,'upload_image']);
+
+
+Route::post('/featured-products', [Products::class,'featured_products']);
+Route::post('/auction-products', [Products::class,'auction_products']);
+
+Route::post('/wishlist-products', [WishlistController::class,'index']);
+Route::post('/add-wishlist-products', [WishlistController::class,'store']);
+Route::post('/remove-wishlist-products', [WishlistController::class,'destroy']);

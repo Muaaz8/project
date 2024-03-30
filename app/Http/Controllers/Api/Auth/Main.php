@@ -24,7 +24,7 @@ class Main extends Controller
         if ($validator_a->fails()) {
             return response()->json([
                 'status' => 'error',
-                'msg' => $validator_a->errors()->first(),
+                'msg' => $validator_a->errors(),
             ], 401);
         }
         $email = $request->email;
@@ -55,7 +55,7 @@ class Main extends Controller
         if ($validator_a->fails()) {
             return response()->json([
                 'status' => 'error',
-                'msg' => $validator_a->errors()->first(),
+                'msg' => $validator_a->errors(),
             ], 401);
         }
         $email = $request->email;
@@ -72,7 +72,7 @@ class Main extends Controller
               return response()->json([
                 'status' => 'success',
                 'msg' => 'Your password has been updated.',
-                'data' => $data, 
+                'data' => $data,
               ], 200);
 
     }
@@ -84,7 +84,7 @@ class Main extends Controller
           if ($validator_a->fails()) {
               return response()->json([
                     'status' => 'error',
-                    'msg' => $validator_a->errors()->first(),
+                    'msg' => $validator_a->errors(),
               ], 401);
           }
           $data = User::where('email', $request->email)
@@ -107,8 +107,8 @@ class Main extends Controller
                 return response()->json([
                     'status' => 'success',
                   'msg' => 'We have sent a password reset otp code to your email',
-                  'otp' => $code, 
-                  'data' => $data, 
+                  'otp' => $code,
+                  'data' => $data,
                 ], 200);
           } else {
               return response()->json([
@@ -129,7 +129,7 @@ class Main extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()
             ], 401); // Bad Request
         }
 
@@ -159,7 +159,7 @@ class Main extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()
             ], 401); // Unprocessable Entity
         }
 
@@ -211,7 +211,7 @@ class Main extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()
             ], 401); // Unprocessable Entity
         }
 

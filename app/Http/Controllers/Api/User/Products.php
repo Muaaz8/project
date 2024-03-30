@@ -27,7 +27,7 @@ class Products extends Controller
         if ($validator_a->fails()) {
             return response()->json([
                 'status' => 'error',
-                'msg' => $validator_a->errors()->first(),
+                'msg' => $validator_a->errors(),
             ], 401);
         }
 
@@ -77,7 +77,7 @@ class Products extends Controller
         if ($validator_a->fails()) {
             return response()->json([
                 'status' => 'error',
-                'msg' => $validator_a->errors()->first(),
+                'msg' => $validator_a->errors(),
             ], 401);
         }
         $product = Product::where('id', $request->product_id)->first();
@@ -120,7 +120,7 @@ class Products extends Controller
         if ($validator_a->fails()) {
             return response()->json([
                 'status' => 'error',
-                'msg' => $validator_a->errors()->first(),
+                'msg' => $validator_a->errors(),
             ], 401);
         }
         $product = Product::where('id', $request->product_id)->first();
@@ -144,7 +144,7 @@ class Products extends Controller
                 if ($validator_b->fails()) {
                     return response()->json([
                         'status' => 'error',
-                        'msg' => $validator_b->errors()->first(),
+                        'msg' => $validator_b->errors(),
                     ], 401);
                 }
                 $product->starting_date = $request->starting_date;
@@ -169,9 +169,9 @@ class Products extends Controller
         }
     }
 
-     // Last Step
-     public function last_step(Request $request)
-     {
+    // Last Step
+    public function last_step(Request $request)
+    {
          $validator_a = Validator::make($request->all(), [
              'product_id' => 'required|exists:product,id',
              'location' => 'required',
@@ -179,7 +179,7 @@ class Products extends Controller
          if ($validator_a->fails()) {
              return response()->json([
                  'status' => 'error',
-                 'msg' => $validator_a->errors()->first(),
+                 'msg' => $validator_a->errors(),
              ], 401);
          }
          $product = Product::where('id', $request->product_id)->first();
@@ -194,40 +194,104 @@ class Products extends Controller
                 'data' => $product
             ], 200);
          }
+    }
+
+    public function upload_image(Request $request)
+    {
+        $validator_a = Validator::make($request->all(), [
+            'product_id' => 'required|exists:product,id',
+            'src' => 'required',
+        ]);
+        if ($validator_a->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $validator_a->errors(),
+            ], 401);
+        }
+        $product = Product::where('id', $request->product_id)->first();
+        if ($product) {
+            $extension =  $request->src->getClientOriginalExtension();
+            $filename = Str::random(9) . '-' . Str::uuid() . time() . '.' . $request->src->getClientOriginalExtension();
+            $request->src->move(public_path('storage/ads_imgs'), $filename);
+            Photo::create([
+                'product_id' => $product->id,
+                'src' => "storage/ads_imgs/{$filename}",
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'msg' => 'Image added to product!',
+                'product_id' => $request->product_id,
+                'data' => $product
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'msg' => 'Product id not found!',
+            ], 401);
+        }
+    }
+
+    public function featured_products(Request $request){
+        $query = Product::with(['user','category','sub_category'])->where('fix_price','!=',null);
+
+        if ($request->filled('id')) {
+            $query->where('id', $request->id);
         }
 
-        public function upload_image(Request $request)
-        {
-            $validator_a = Validator::make($request->all(), [
-                'product_id' => 'required|exists:product,id',
-                'src' => 'required',
-            ]);
-            if ($validator_a->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'msg' => $validator_a->errors()->first(),
-                ], 401);
-            }
-            $product = Product::where('id', $request->product_id)->first();
-            if ($product) {
-                $image = $request->src;
-                $imageName = Str::random(9) . '-' . Str::uuid() . time() . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('ads_imgs', $imageName, 'public');
-                Photo::create([
-                    'product_id' => $product->id,
-                    'src' => "storage/ads_imgs/{$imageName}",
-                ]);
-               return response()->json([
-                   'status' => 'success',
-                   'msg' => 'Image added to product!',
-                   'product_id' => $request->product_id,
-                   'data' => $product
-               ], 200);
-            }else{
-                return response()->json([
-                    'status' => 'error',
-                    'msg' => 'Product id not found!',
-                ], 401);
-            }
-           }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('title', 'LIKE', "%{$request->search}%");
+        }
+
+        if ($request->filled('limit')) {
+            $query->limit($request->limit);
+        }
+
+        if ($request->filled('location')) {
+            $query->where('location','LIKE',"%{$request->location}%");
+        }
+
+        $featured_products = $query->get();
+
+        return $this->sendResponse($featured_products,'Featured Products Retrived Successfully.');
+    }
+
+    public function auction_products(Request $request){
+        $query = Product::with(['user','category','sub_category'])->where('auction_price','!=',null);
+
+        if ($request->filled('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('title', 'LIKE', "%{$request->search}%");
+        }
+
+        if ($request->filled('limit')) {
+            $query->limit($request->limit);
+        }
+
+        if ($request->filled('location')) {
+            $query->where('location','LIKE',"%{$request->location}%");
+        }
+
+        $auction_products = $query->get();
+
+        return $this->sendResponse($auction_products,'Auction Products Retrived Successfully.');
+    }
 }
