@@ -3,32 +3,15 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Chat as Ch;
 use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\ServiceAccount;
+use Illuminate\Support\Facades\Validator;
 
 class Chat extends Controller
 {
-    public function send_msg(Request $request)
-    {
-        $input['sender_id'] = $request->sender_id;
-        $input['receiver_id'] = $request->receiver_id;
-        $input['message'] = $request->msg;
-        $input['status'] = "sent";
-        $conversation = Ch::where('from',$request->from)->where('to',$request->to)->first();
-        $conversation1 = Ch::where('to',$request->from)->where('from',$request->to)->first();
-        if($conversation){
-            $input['conversation_id'] = $conversation->conversation_id;
-        }elseif ($conversation1) {
-            $input['conversation_id'] = $conversation->conversation_id;
-        }else{
-            $input['conversation_id'] = date('YmdHis');
-        }
-        $msg = Ch::Create($input);
-        $this->firebase($request->to,$request->from,$input);
-    }
-
     public function firebase($id,$type,$data)
     { 
         $app = "Chats";
@@ -44,78 +27,97 @@ class Chat extends Controller
         $blogRef->getChild($id)->getChild($type)->set($data);
     }
 
-    public function agent_send_message(Request $request)
+    public function send_msg(Request $request)
     {
-        $client_id = $request->client_id;
-        $imagePaths = [];
-        $count = 0;
-        $text_msg = $request->send_msg;
+        $validator = Validator::make($request->all(), [
+            'sender_id'     => 'required|exists:users,id',
+            'receiver_id'   => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $images = [];
+        $docs = [];
+        $text = [];
+
         if ($request->hasFile('images')) {
-            foreach ($request->file('document') as $image) {
+            foreach ($request->file('images') as $image) {
                 $path = $image->store('public/images');
                 $path = Storage::url($path);
                 $filename = $image->getClientOriginalName();
-
-                $response = $this->send_image_msg($path,$client_id,$filename);
-                //$response = "success";
+                $input = [];
+                $input['sender_id'] = $request->sender_id;
+                $input['receiver_id'] = $request->receiver_id;
+                $input['file'] = $path;
+                $input['file_name'] = $filename;
+                $input['file_type'] = "img";
+                $input['status'] = "sent";
+                $conversation = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first();
+                $conversation1 = Ch::where('receiver_id',$request->sender_id)->where('sender_id',$request->receiver_id)->first();
+                if($conversation){
+                    $input['conversation_id'] = $conversation->conversation_id;
+                }elseif ($conversation1) {
+                    $input['conversation_id'] = $conversation->conversation_id;
+                }else{
+                    $input['conversation_id'] = date('YmdHis');
+                }
+                $msg = Ch::Create($input);
+                $this->firebase($request->receiver_id,$request->sender_id,$input);
+                $images[] = $msg;
             }
         }
 
-        $docsPaths = [];
-        if ($request->hasFile('docs')) {
-            foreach ($request->file('docs') as $image) {
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents') as $image) {
                 $path = $image->store('public/documents');
                 $path = Storage::url($path);
                 $filename = $image->getClientOriginalName();
-                $response = $this->send_docs_msg($path,$client_id,$filename);
-                //$response = "success";
-                if($response == "success"){
-                    $docsPaths[] = $path;
+                $input = [];
+                $input['sender_id'] = $request->sender_id;
+                $input['receiver_id'] = $request->receiver_id;
+                $input['file'] = $path;
+                $input['file_name'] = $filename;
+                $input['file_type'] = "doc";
+                $input['status'] = "sent";
+                $conversation = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first();
+                $conversation1 = Ch::where('receiver_id',$request->sender_id)->where('sender_id',$request->receiver_id)->first();
+                if($conversation){
+                    $input['conversation_id'] = $conversation->conversation_id;
+                }elseif ($conversation1) {
+                    $input['conversation_id'] = $conversation->conversation_id;
+                }else{
+                    $input['conversation_id'] = date('YmdHis');
                 }
+                $msg = Ch::Create($input);
+                $this->firebase($request->receiver_id,$request->sender_id,$input);
+                $docs[] = $msg;
             }
         }
 
-        $audsPaths = [];
-        if ($request->hasFile('auds')) {
-            foreach ($request->file('auds') as $image) {
-                $path = $image->store('public/audio');
-                $path = Storage::url($path);
-                $filename = $image->getClientOriginalName();
-                $response = $this->send_aud_msg($path,$client_id,$filename);
-                //$response = "success";
-                if($response == "success"){
-                    $audsPaths[] = $path;
-                }
-            }
-        }
-
-        $vidsPaths = [];
-        if ($request->hasFile('vids')) {
-            foreach ($request->file('vids') as $image) {
-                $path = $image->store('public/video');
-                $path = Storage::url($path);
-                $filename = $image->getClientOriginalName();
-                $response = $this->send_vid_msg($path,$client_id,$filename);
-                //$response = "success";
-                if($response == "success"){
-                    $vidsPaths[] = $path;
-                }
-            }
-        }
-
-        if($text_msg != null && $text_msg != ""){
-            $response = $this->send_text_msg($text_msg,$client_id);
-            if($response == "success"){
-                $data['msg'] = $text_msg;
+        if($request->has('message')){
+            $input = [];
+            $input['sender_id'] = $request->sender_id;
+            $input['receiver_id'] = $request->receiver_id;
+            $input['message'] = $request->message;
+            $input['status'] = "sent";
+            $conversation = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first();
+            $conversation1 = Ch::where('receiver_id',$request->sender_id)->where('sender_id',$request->receiver_id)->first();
+            if($conversation){
+                $input['conversation_id'] = $conversation->conversation_id;
+            }elseif ($conversation1) {
+                $input['conversation_id'] = $conversation->conversation_id;
             }else{
-                $data['msg'] = $response;
+                $input['conversation_id'] = date('YmdHis');
             }
+            $msg = Ch::Create($input);
+            $this->firebase($request->receiver_id,$request->sender_id,$input);
+            $text[] = $msg;
         }
-        $data['client'] = $request->client_id;
-        $data['images'] = $imagePaths;
-        $data['docs'] = $docsPaths;
-        $data['auds'] = $audsPaths;
-        $data['vids'] = $vidsPaths;
-        return $data;
+        $data['Message'] = $text;
+        $data['Documanets'] = $docs;
+        $data['Images'] = $images;
+        return $this->sendResponse($data,'Message Send Successfully.');
     }
 }
