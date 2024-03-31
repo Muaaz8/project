@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\Main;
 use App\Http\Controllers\Api\User\Category;
 use App\Http\Controllers\Api\User\Products;
+use App\Http\Controllers\Front\Chat;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,3 +35,6 @@ Route::post('/add-product-second-step', [Products::class,'second_step']);
 Route::post('/add-product-third-step', [Products::class,'third_step']);
 Route::post('/add-product-last-step', [Products::class,'last_step']);
 Route::post('/upload-image', [Products::class,'upload_image']);
+
+
+Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
