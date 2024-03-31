@@ -143,4 +143,17 @@ class Chat extends Controller
         $data['Participant2'] = $user2;
         return $this->sendResponse($data,'Retreived Conversation of user Successfully.');
     }
+
+    public function delete_message($id)
+    {
+        $Message = Ch::find($id);
+        $Message->delete();
+        return $this->sendResponse($Message,'Message Deleted Successfully.');
+    }
+
+    public function delete_conversation($id)
+    {
+        $conversation = Ch::where('conversation_id',$id)->delete();
+        return $this->sendResponse($conversation,'Conversation Deleted Successfully.');
+    }
 }

@@ -41,6 +41,8 @@ Route::post('/upload-image', [Products::class,'upload_image']);
 Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
 Route::get('/get/user/all/chats/{id}', [Chat::class, 'get_all_chats_of_user'])->name('get_all_chats_of_user');
 Route::get('/get/conversation/{conversation_id}', [Chat::class, 'get_conversation'])->name('get_conversation');
+Route::get('/delete/message/{message_id}', [Chat::class, 'delete_message'])->name('delete_message');
+Route::get('/delete/conversation/{conversation_id}', [Chat::class, 'delete_conversation'])->name('delete_conversation');
 
 
 Route::post('/featured-products', [Products::class,'featured_products']);
