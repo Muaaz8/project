@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Auth\Main;
 use App\Http\Controllers\Api\User\Category;
 use App\Http\Controllers\Api\User\Products;
 use App\Http\Controllers\Front\Chat;
+use App\Http\Controllers\Api\User\WishlistController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -37,4 +38,13 @@ Route::post('/add-product-last-step', [Products::class,'last_step']);
 Route::post('/upload-image', [Products::class,'upload_image']);
 
 
+<<<<<<< HEAD
 Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
+=======
+Route::post('/featured-products', [Products::class,'featured_products']);
+Route::post('/auction-products', [Products::class,'auction_products']);
+
+Route::post('/wishlist-products', [WishlistController::class,'index']);
+Route::post('/add-wishlist-products', [WishlistController::class,'store']);
+Route::post('/remove-wishlist-products', [WishlistController::class,'destroy']);
+>>>>>>> 7866e657aecb2376a2b499a669d30525184a4d92
