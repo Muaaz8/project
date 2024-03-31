@@ -37,8 +37,12 @@ Route::post('/add-product-third-step', [Products::class,'third_step']);
 Route::post('/add-product-last-step', [Products::class,'last_step']);
 Route::post('/upload-image', [Products::class,'upload_image']);
 
-
+//Chatting Routes
 Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
+Route::get('/get/user/all/chats/{id}', [Chat::class, 'get_all_chats_of_user'])->name('get_all_chats_of_user');
+Route::get('/get/conversation/{conversation_id}', [Chat::class, 'get_conversation'])->name('get_conversation');
+
+
 Route::post('/featured-products', [Products::class,'featured_products']);
 Route::post('/auction-products', [Products::class,'auction_products']);
 

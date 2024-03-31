@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Chat as Ch;
+use App\Models\User;
 use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\ServiceAccount;
 use Illuminate\Support\Facades\Validator;
@@ -119,5 +120,27 @@ class Chat extends Controller
         $data['Documanets'] = $docs;
         $data['Images'] = $images;
         return $this->sendResponse($data,'Message Send Successfully.');
+    }
+
+    public function get_all_chats_of_user($id)
+    {
+        $chats = Ch::where('sender_id',$id)->orwhere('receiver_id',$id)->groupby('conversation_id')->get();
+        foreach ($chats as $key => $chat) {
+            $chat->sender = User::find($chat->sender_id);
+            $chat->receiver = User::find($chat->receiver_id);
+        }
+        return $this->sendResponse($chats,'Retreived All Chats of user Successfully.');
+    }
+
+    public function get_conversation($conversation_id)
+    {
+        $conversation = Ch::where('conversation_id',$conversation_id)->get();
+        $msg = Ch::where('conversation_id',$conversation_id)->first();
+        $user1 = User::find($msg->sender_id);
+        $user2 = User::find($msg->receiver_id);
+        $data['conversation'] = $conversation;
+        $data['Participant1'] = $user1;
+        $data['Participant2'] = $user2;
+        return $this->sendResponse($data,'Retreived Conversation of user Successfully.');
     }
 }
