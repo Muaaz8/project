@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Auth\Main;
 use App\Http\Controllers\Api\User\Category;
 use App\Http\Controllers\Api\User\Products;
 use App\Http\Controllers\Front\Chat;
+use App\Http\Controllers\Front\Notification;
 use App\Http\Controllers\Front\AuctionController;
 use App\Http\Controllers\Api\User\WishlistController;
 /*
@@ -48,6 +49,14 @@ Route::get('/get/user/all/chats/{id}', [Chat::class, 'get_all_chats_of_user'])->
 Route::get('/get/conversation/{conversation_id}', [Chat::class, 'get_conversation'])->name('get_conversation');
 Route::get('/delete/message/{message_id}', [Chat::class, 'delete_message'])->name('delete_message');
 Route::get('/delete/conversation/{conversation_id}', [Chat::class, 'delete_conversation'])->name('delete_conversation');
+
+//Notification Routes
+Route::get('/get/user/all/notifications/{id}',[Notification::class, 'get_user_all_notifications'])->name('get_user_all_notifications');
+Route::get('/get/user/unread/notifications/{id}',[Notification::class, 'get_user_unread_notifications'])->name('get_user_unread_notifications');
+Route::get('/get/user/read/notifications/{id}',[Notification::class, 'get_user_read_notifications'])->name('get_user_read_notifications');
+Route::get('/change/notification/status/{id}', [Notification::class, 'change_notification_status'])->name('change_notification_status');
+Route::get('/delete/single/notification/{id}', [Notification::class, 'delete_single_notification'])->name('delete_single_notification');
+Route::post('/delete/notifications', [Notification::class, 'delete_notifications'])->name('delete_notifications');
 
 // Wishlist Routes
 Route::post('/wishlist-products', [WishlistController::class,'index']);

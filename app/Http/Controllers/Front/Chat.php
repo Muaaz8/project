@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Chat as Ch;
+use App\Models\Notification;
 use App\Models\User;
 use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\ServiceAccount;
@@ -26,6 +27,21 @@ class Chat extends Controller
         $data['date'] = date('m-d-Y');
         $data['time'] = date('h:i A');
         $blogRef->getChild($id)->getChild($type)->set($data);
+    }
+
+    public function firebase_notification($id,$data)
+    { 
+        $app = "Notifications";
+        // Get a reference to the database
+        $firebase = (new \Kreait\Firebase\Factory)
+        ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
+        ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+        // Get a reference to the "users" node
+        $database = $firebase->createDatabase();
+        $blogRef = $database->getReference($app);
+        $data['date'] = date('m-d-Y');
+        $data['time'] = date('h:i A');
+        $blogRef->getChild($id)->set($data);
     }
 
     public function send_msg(Request $request)
@@ -119,6 +135,18 @@ class Chat extends Controller
         $data['Message'] = $text;
         $data['Documanets'] = $docs;
         $data['Images'] = $images;
+        if($text!=[] || $docs!=[] || $images!=[]){
+            $sender = User::find($request->sender_id);
+            $convo  = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first(); 
+            $noti_text = "You have got a new message from ".$sender->name;
+            $notification['user_id'] = $request->receiver_id;
+            $notification['text'] = $noti_text;
+            $notification['type'] = "conversation";
+            $notification['type_id'] = $convo->conversation_id;
+            $notification['status'] = "unread";
+            $notif = Notification::create($notification);
+            $this->firebase_notification($request->receiver_id,$notif);
+        }
         return $this->sendResponse($data,'Message Send Successfully.');
     }
 
