@@ -233,7 +233,7 @@ class Products extends Controller
     }
 
     public function featured_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo'])->where('fix_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video'])->where('fix_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -265,7 +265,7 @@ class Products extends Controller
     }
 
     public function auction_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo'])->where('auction_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video'])->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
