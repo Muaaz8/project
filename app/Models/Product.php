@@ -43,4 +43,8 @@ class Product extends Model
     public function sub_category(){
         return $this->belongsTo(Sub_Category::class);
     }
+
+    public function photo(){
+        return $this->hasMany(Photo::class);
+    }
 }

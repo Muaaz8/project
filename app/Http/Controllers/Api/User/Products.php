@@ -215,8 +215,9 @@ class Products extends Controller
             $request->src->move(public_path('storage/ads_imgs'), $filename);
             Photo::create([
                 'product_id' => $product->id,
-                'src' => "storage/ads_imgs/{$filename}",
+                'src' => env('APP_URL')."storage/ads_imgs/{$filename}",
             ]);
+            $product = Product::with('photo')->where('id', $request->product_id)->first();
             return response()->json([
                 'status' => 'success',
                 'msg' => 'Image added to product!',
@@ -232,7 +233,7 @@ class Products extends Controller
     }
 
     public function featured_products(Request $request){
-        $query = Product::with(['user','category','sub_category'])->where('fix_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo'])->where('fix_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -264,7 +265,7 @@ class Products extends Controller
     }
 
     public function auction_products(Request $request){
-        $query = Product::with(['user','category','sub_category'])->where('auction_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo'])->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);

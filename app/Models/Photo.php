@@ -13,4 +13,8 @@ class Photo extends Model
         'product_id',
         'src',
     ];
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
 }
