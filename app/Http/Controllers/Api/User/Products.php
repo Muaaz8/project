@@ -55,7 +55,7 @@ class Products extends Controller
             $request->video->storeAs('ads_videos', $videoName, 'public');
             Video::create([
                 'product_id' => $product->id,
-                'src' => "storage/ads_videos/{$videoName}",
+                'src' => env('APP_URL')."storage/ads_videos/{$videoName}",
             ]);
         }
 
