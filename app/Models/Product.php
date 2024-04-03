@@ -51,4 +51,8 @@ class Product extends Model
     public function video(){
         return $this->hasMany(Video::class);
     }
+
+    public function auction(){
+        return $this->hasMany(Auction::class);
+    }
 }

@@ -265,7 +265,9 @@ class Products extends Controller
     }
 
     public function auction_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo','video'])->where('auction_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video','auction'])
+            // ->join('auctions','auctions.product_id','product.id')
+            ->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);

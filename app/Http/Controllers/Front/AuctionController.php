@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Auction;
+use App\Models\Notification;
+use App\Models\User;
+use App\Models\Product;
 use App\Http\Controllers\Front\Chat;
 
 class AuctionController extends Controller
@@ -22,8 +25,22 @@ class AuctionController extends Controller
         }
 
         $bid = Auction::create($request->all());
+
+        $receiver_id = Product::find($request->product_id)->user_id;
+        $sender = User::find($request->user_id);
+        $receiver = User::find($receiver_id);
+        $noti_text = $sender->name." placed a bid on your product.";
+        $notification['user_id'] = $receiver_id;
+        $notification['text'] = $noti_text;
+        $notification['type'] = "auction";
+        $notification['type_id'] = null;
+        $notification['status'] = "unread";
+        $notif = Notification::create($notification);
+
         $e = new Chat();
-        $e->firebase($request->product_id,$request->user_id,$bid);
+        $e->firebase_notification($receiver_id,$notif);
+        $e->firebase_auction($request->product_id,$bid);
+
         return $this->sendResponse($bid,"Bid placed Successfully");
     }
 

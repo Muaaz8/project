@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 class Chat extends Controller
 {
     public function firebase($id,$type,$data)
-    { 
+    {
         $app = "Chats";
         // Get a reference to the database
         $firebase = (new \Kreait\Firebase\Factory)
@@ -30,8 +30,23 @@ class Chat extends Controller
     }
 
     public function firebase_notification($id,$data)
-    { 
+    {
         $app = "Notifications";
+        // Get a reference to the database
+        $firebase = (new \Kreait\Firebase\Factory)
+        ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
+        ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+        // Get a reference to the "users" node
+        $database = $firebase->createDatabase();
+        $blogRef = $database->getReference($app);
+        $data['date'] = date('m-d-Y');
+        $data['time'] = date('h:i A');
+        $blogRef->getChild($id)->set($data);
+    }
+
+    public function firebase_auction($id,$data)
+    {
+        $app = "Auction";
         // Get a reference to the database
         $firebase = (new \Kreait\Firebase\Factory)
         ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
@@ -137,7 +152,7 @@ class Chat extends Controller
         $data['Images'] = $images;
         if($text!=[] || $docs!=[] || $images!=[]){
             $sender = User::find($request->sender_id);
-            $convo  = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first(); 
+            $convo  = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first();
             $noti_text = "You have got a new message from ".$sender->name;
             $notification['user_id'] = $request->receiver_id;
             $notification['text'] = $noti_text;

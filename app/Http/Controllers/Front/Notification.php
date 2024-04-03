@@ -22,6 +22,7 @@ class Notification extends Controller
 
     public function get_user_unread_notifications($id)
     {
+
         $type = request('type');
         if($type){
             $notifications = Nt::where('user_id',$id)->where('type',$type)->where('status','unread')->get();

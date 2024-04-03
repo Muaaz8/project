@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\User\Products;
 use App\Http\Controllers\Front\Chat;
 use App\Http\Controllers\Front\Notification;
 use App\Http\Controllers\Front\AuctionController;
+use App\Http\Controllers\Front\MakeOfferController;
 use App\Http\Controllers\Api\User\WishlistController;
 /*
 |--------------------------------------------------------------------------
@@ -66,3 +67,7 @@ Route::post('/remove-wishlist-products', [WishlistController::class,'destroy']);
 // Auction Routes
 Route::post('/place-bid', [AuctionController::class,'place_bid']);
 Route::post('/get-placed-bids', [AuctionController::class,'get_placed_bids']);
+
+// Make Offer Routes
+Route::post('/make-offer', [MakeOfferController::class,'make_offer']);
+Route::post('/get-offer', [MakeOfferController::class,'get_offer']);
