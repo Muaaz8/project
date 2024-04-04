@@ -82,7 +82,7 @@ class Chat extends Controller
                 $input = [];
                 $input['sender_id'] = $request->sender_id;
                 $input['receiver_id'] = $request->receiver_id;
-                $input['file'] = $path;
+                $input['file'] = "https://ttoffer.com".$path;
                 $input['file_name'] = $filename;
                 $input['file_type'] = "img";
                 $input['status'] = "sent";
@@ -109,7 +109,7 @@ class Chat extends Controller
                 $input = [];
                 $input['sender_id'] = $request->sender_id;
                 $input['receiver_id'] = $request->receiver_id;
-                $input['file'] = $path;
+                $input['file'] = "https://ttoffer.com".$path;
                 $input['file_name'] = $filename;
                 $input['file_type'] = "doc";
                 $input['status'] = "sent";
