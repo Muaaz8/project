@@ -258,6 +258,27 @@ class Products extends Controller
         if ($request->filled('location')) {
             $query->where('location','LIKE',"%{$request->location}%");
         }
+        if ($request->filled('sort_by')) {
+            if(Str::lower($request->sort_by) == "newest on top"){
+                $query->orderby('id','desc');
+            }elseif(Str::lower($request->sort_by) == "newest on bottom"){
+                $query->orderby('id','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on top"){
+                $query->orderby('fix_price','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on bottom"){
+                $query->orderby('fix_price','desc');
+            }
+        }
+        if ($request->filled('is_urgert')) {
+            $query->where('is_urgert',$request->is_urgert);
+        }
+        if ($request->filled('min_price')) {
+            $query->where('fix_price','>=',$request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('fix_price','<=',$request->max_price);
+        }
 
         $featured_products = $query->get();
 
@@ -266,7 +287,6 @@ class Products extends Controller
 
     public function auction_products(Request $request){
         $query = Product::with(['user','category','sub_category','photo','video','auction'])
-            // ->join('auctions','auctions.product_id','product.id')
             ->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
@@ -292,9 +312,52 @@ class Products extends Controller
         if ($request->filled('location')) {
             $query->where('location','LIKE',"%{$request->location}%");
         }
+        if ($request->filled('sort_by')) {
+            if(Str::lower($request->sort_by) == "newest on top"){
+                $query->orderby('id','desc');
+            }elseif(Str::lower($request->sort_by) == "newest on bottom"){
+                $query->orderby('id','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on top"){
+                $query->orderby('auction_price','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on bottom"){
+                $query->orderby('auction_price','desc');
+            }
+        }
+        if ($request->filled('is_urgert')) {
+            $query->where('is_urgert',$request->is_urgert);
+        }
+        if ($request->filled('min_price')) {
+            $query->where('auction_price','>=',$request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('auction_price','<=',$request->max_price);
+        }
 
         $auction_products = $query->get();
 
         return $this->sendResponse($auction_products,'Auction Products Retrived Successfully.');
+    }
+
+    public function product_review(Request $request){
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:product,id',
+            'review_quantity' => 'required|max:5|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $product = Product::where('id', $request->product_id)->first();
+
+        if ($product->review_percentage == 0) {
+            $rating = $request->review_quantity;
+        } else {
+            $rating = ($request->review_quantity+$product->review_percentage)/2;
+        }
+        $product->review_percentage = $rating;
+        $product->total_review++;
+        $product->save();
+        return $this->sendResponse($product,'Review Added Successfully.');
     }
 }

@@ -71,3 +71,6 @@ Route::post('/get-placed-bids', [AuctionController::class,'get_placed_bids']);
 // Make Offer Routes
 Route::post('/make-offer', [MakeOfferController::class,'make_offer']);
 Route::post('/get-offer', [MakeOfferController::class,'get_offer']);
+
+//Add Review to Product Routes
+Route::post('/product-review',[Products::class,'product_review']);

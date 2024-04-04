@@ -30,6 +30,9 @@ class Product extends Model
         'sell_to_us',
         'location',
         'status',
+        'is_urgent',
+        'total_review',
+        'review_percentage',
     ];
 
     public function user(){
