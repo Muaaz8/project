@@ -10,6 +10,8 @@ use Hash;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use JWTAuth;
 use Illuminate\Support\Str;
 use Mail;
 use App\Mail\Reset;
@@ -185,20 +187,31 @@ class Main extends Controller
                 'message' => 'Your account is blocked by admin!',
             ], 401); // Forbidden
         }
-        $credentials['username'] = $user->username;
+        $credentials['phone'] = $request->phone;
         $credentials['password'] = $request->password;
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Login details are not valid!',
-            ], 401); // Unauthorized
+        try {
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not create token'], 500);
         }
+
+        $return['user']   = $user;
+        $return['token']  = $token;
+
+        // if (!Auth::attempt($credentials)) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Login details are not valid!',
+        //     ], 401); // Unauthorized
+        // }
 
         return response()->json([
             'status' => 'success',
             'message' => 'You are logged in successfully.',
-            'data' => $user,
+            'data' => $return,
         ], 200); // OK
     }
 
@@ -238,17 +251,31 @@ class Main extends Controller
             ], 401); // Forbidden
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Login details are not valid!',
-            ], 401); // Unauthorized
+        $credentials['email']    = $request->email;
+        $credentials['password'] = $request->password;
+
+        try {
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not create token'], 500);
         }
+
+        $return['user']   = $user;
+        $return['token']  = $token;
+
+        // if (!Auth::attempt($request->only('email', 'password'))) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Login details are not valid!',
+        //     ], 401); // Unauthorized
+        // }
 
         return response()->json([
             'status' => 'success',
             'message' => 'You are logged in successfully.',
-            'data' => $user,
+            'data' => $return,
         ], 200); // OK
     }
 }
