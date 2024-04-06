@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use JWTAuth;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Photo;
@@ -240,7 +240,10 @@ class Products extends Controller
     }
 
     public function featured_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo','video','wishlist'])->where('fix_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video','wishlist' => function($query) {
+            $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
+        }])
+        ->where('fix_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -293,8 +296,10 @@ class Products extends Controller
     }
 
     public function auction_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo','video','auction','wishlist'])
-            ->where('auction_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video','auction','wishlist' => function($query) {
+            $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
+        }])
+        ->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
