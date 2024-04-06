@@ -51,6 +51,10 @@ class Product extends Model
         return $this->hasMany(Photo::class);
     }
 
+    public function wishlist(){
+        return $this->hasMany(Wishlist::class);
+    }
+
     public function video(){
         return $this->hasMany(Video::class);
     }

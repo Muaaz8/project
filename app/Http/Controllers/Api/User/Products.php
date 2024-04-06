@@ -50,13 +50,15 @@ class Products extends Controller
 
         // Video
         if ($request->hasfile('video')) {
-            $video = $request->file('video');
-            $videoName = Str::random(9) . '-' . Str::uuid() . time() . '.' . $video->getClientOriginalExtension();
-            $request->video->storeAs('ads_videos', $videoName, 'public');
-            Video::create([
-                'product_id' => $product->id,
-                'src' => env('APP_URL')."storage/ads_videos/{$videoName}",
-            ]);
+            foreach ($request->file('video') as $key => $value) {
+                $video = $value;
+                $videoName = Str::random(9) . '-' . Str::uuid() . time() . '.' . $video->getClientOriginalExtension();
+                $request->video->storeAs('ads_videos', $videoName, 'public');
+                Video::create([
+                    'product_id' => $product->id,
+                    'src' => env('APP_URL')."storage/ads_videos/{$videoName}",
+                ]);
+            }
         }
 
         return response()->json([
@@ -210,13 +212,18 @@ class Products extends Controller
         }
         $product = Product::where('id', $request->product_id)->first();
         if ($product) {
-            $extension =  $request->src->getClientOriginalExtension();
-            $filename = Str::random(9) . '-' . Str::uuid() . time() . '.' . $request->src->getClientOriginalExtension();
-            $request->src->move(public_path('storage/ads_imgs'), $filename);
-            Photo::create([
-                'product_id' => $product->id,
-                'src' => env('APP_URL')."storage/ads_imgs/{$filename}",
-            ]);
+            if ($request->hasfile('src')) {
+                foreach ($request->file('src') as $key => $value) {
+                    $image = $value;
+                    $extension =  $image->getClientOriginalExtension();
+                    $filename = Str::random(9) . '-' . Str::uuid() . time() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('storage/ads_imgs'), $filename);
+                    Photo::create([
+                        'product_id' => $product->id,
+                        'src' => env('APP_URL')."storage/ads_imgs/{$filename}",
+                    ]);
+                }
+            }
             $product = Product::with('photo')->where('id', $request->product_id)->first();
             return response()->json([
                 'status' => 'success',
@@ -233,7 +240,7 @@ class Products extends Controller
     }
 
     public function featured_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo','video'])->where('fix_price','!=',null)->where('status','1');
+        $query = Product::with(['user','category','sub_category','photo','video','wishlist'])->where('fix_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -286,7 +293,7 @@ class Products extends Controller
     }
 
     public function auction_products(Request $request){
-        $query = Product::with(['user','category','sub_category','photo','video','auction'])
+        $query = Product::with(['user','category','sub_category','photo','video','auction','wishlist'])
             ->where('auction_price','!=',null)->where('status','1');
 
         if ($request->filled('id')) {
@@ -323,8 +330,8 @@ class Products extends Controller
                 $query->orderby('auction_price','desc');
             }
         }
-        if ($request->filled('is_urgert')) {
-            $query->where('is_urgert',$request->is_urgert);
+        if ($request->filled('is_urgent')) {
+            $query->where('is_urgent',$request->is_urgert);
         }
         if ($request->filled('min_price')) {
             $query->where('auction_price','>=',$request->min_price);
