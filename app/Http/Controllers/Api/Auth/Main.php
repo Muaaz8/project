@@ -145,11 +145,26 @@ class Main extends Controller
             'password' => Hash::make($request->password),
         ]);
         $data = User::where('id',$user->id)->first();
-            return response()->json([
-                'status' => 'success',
-                'data' => $data,
-                'message' => 'Account registered, redirecting...',
-            ], 200); // Created
+
+        $credentials['email']    = $request->email;
+        $credentials['password']    = $request->password;
+
+        try {
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not create token'], 500);
+        }
+
+        $return['user']   = $data;
+        $return['token']  = $token;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $return,
+            'message' => 'Account registered, redirecting...',
+        ], 200); // Created
     }
 
     public function login_with_username(Request $request){
