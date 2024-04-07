@@ -22,7 +22,7 @@ class Products extends Controller
             'user_id' => 'required|exists:users,id',
             'title' => 'required',
             'description' => 'required',
-            'video' => 'nullable|file|mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4',
+            // 'video' => 'nullable|file|mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4',
         ]);
         if ($validator_a->fails()) {
             return response()->json([
@@ -53,12 +53,13 @@ class Products extends Controller
             foreach ($request->file('video') as $key => $value) {
                 $video = $value;
                 $videoName = Str::random(9) . '-' . Str::uuid() . time() . '.' . $video->getClientOriginalExtension();
-                $request->video->storeAs('ads_videos', $videoName, 'public');
+                $video->storeAs('ads_videos', $videoName, 'public');
                 Video::create([
                     'product_id' => $product->id,
                     'src' => env('APP_URL')."storage/ads_videos/{$videoName}",
                 ]);
             }
+
         }
 
         return response()->json([

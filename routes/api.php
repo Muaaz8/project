@@ -11,6 +11,7 @@ use App\Http\Controllers\Front\Notification;
 use App\Http\Controllers\Front\AuctionController;
 use App\Http\Controllers\Front\MakeOfferController;
 use App\Http\Controllers\Api\User\WishlistController;
+use App\Http\Controllers\Api\User\Profile;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +33,13 @@ Route::post('/otp-verify', [Main::class,'reset_code']);
 Route::post('/new-password', [Main::class,'new_password']);
 
 Route::group(['middleware' => 'jwt.auth'], function () {
+
+    //User Profile Routes
+    Route::get('/me',[Profile::class, 'index'])->name('my_info');
+    Route::get('/user/info/{id}',[Profile::class, 'user_info'])->name('user_info');
+    Route::get('/get/all/users',[Profile::class, 'get_all_users'])->name('get_all_users');
+    Route::post('/update/user',[Profile::class, 'update_user'])->name('update_user');
+
     // Listing Products Routes
     Route::post('/categories', [Category::class,'index']);
     Route::post('/sub-categories', [Category::class,'sub_category']);
