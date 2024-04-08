@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use JWTAuth;
 use Hash;
+use App\Models\Product;
 
 class Profile extends Controller
 {
@@ -27,7 +28,7 @@ class Profile extends Controller
     public function get_all_users()
     {
         $user = User::all();
-        return $this->sendResponse($user,'Users Retrived Successfully.');   
+        return $this->sendResponse($user,'Users Retrived Successfully.');
     }
 
     public function update_user(Request $request)
@@ -102,5 +103,17 @@ class Profile extends Controller
         }else{
             return $this->sendError('User Not Updated',[],401);
         }
+    }
+
+    public function selling_screen(){
+        // $id = JWTAuth::user()->id;
+        $id = 5;
+
+        $sold = Product::where('user_id',$id)->where('is_sold',true)->get();
+        $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
+        $purchase = Product::where('user_id',$id)->where('sold_to_user_id',$id)->get();
+
+        $data = ['sold'=>$sold, 'purchase'=> $purchase, 'archive'=> $archive];
+        return $this->sendResponse($data,'User Retrived Successfully.');
     }
 }

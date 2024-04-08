@@ -244,7 +244,10 @@ class Products extends Controller
         $query = Product::with(['user','category','sub_category','photo','video','wishlist' => function($query) {
             $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
         }])
-        ->where('fix_price','!=',null)->where('status','1');
+        ->where('fix_price','!=',null)
+        ->where('status','1')
+        ->where('is_archived',false)
+        ->where('is_sold',false);
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -300,7 +303,10 @@ class Products extends Controller
         $query = Product::with(['user','category','sub_category','photo','video','auction','wishlist' => function($query) {
             $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
         }])
-        ->where('auction_price','!=',null)->where('status','1');
+        ->where('auction_price','!=',null)
+        ->where('status','1')
+        ->where('is_archived',false)
+        ->where('is_sold',false);
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -372,5 +378,31 @@ class Products extends Controller
         $product->total_review++;
         $product->save();
         return $this->sendResponse($product,'Review Added Successfully.');
+    }
+
+    public function mark_product_sold($id){
+        $product = Product::find($id);
+        if(!$product) {
+            return $this->sendError('Product not Found',[],401);
+        }
+
+        $product->status = "0";
+        $product->is_archived = false;
+        $product->is_sold = true;
+        $product->save();
+        return $this->sendResponse($product,'Product Marked Sold Successfully.');
+    }
+
+    public function mark_product_archive($id){
+        $product = Product::find($id);
+        if(!$product) {
+            return $this->sendError('Product not Found',[],401);
+        }
+
+        $product->status = "0";
+        $product->is_archived = true;
+        $product->is_sold = false;
+        $product->save();
+        return $this->sendResponse($product,'Product Marked Archived Successfully.');
     }
 }

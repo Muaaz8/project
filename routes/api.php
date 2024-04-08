@@ -83,4 +83,10 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Add Review to Product Routes
     Route::post('/product-review',[Products::class,'product_review']);
+    Route::get('/mark-product-sold/{id}',[Products::class,'mark_product_sold']);
+    Route::get('/mark-product-archive/{id}',[Products::class,'mark_product_archive']);
+
+
+
 });
+Route::get('/selling-screen',[Profile::class,'selling_screen']);
