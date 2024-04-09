@@ -31,7 +31,7 @@ class Payment extends Controller
         try {
             // Create a charge
             $payment =  Charge::create([
-                'amount' => $data['amount'], // Amount in cents
+                'amount' => $data['amount']*100, // Amount in cents
                 'currency' => $data['currency'],
                 'source' => $data['token'],
                 'description' => $request->description,
@@ -40,7 +40,7 @@ class Payment extends Controller
             {
                 $input['user_id'] = JWTAuth::user()->id;
                 $input['transaction_id'] = $payment->source->id;
-                $input['amount'] = $data['amount'];
+                $input['amount'] = $data['amount']*100;
                 $input['currency'] = $data['currency'];
                 $input['token'] = $data['token'];
                 $input['last_four'] = $payment->source->last4;
@@ -60,6 +60,28 @@ class Payment extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
+
+    public function get_user_all_trans($id)
+    {
+        $transactions = PT::where('user_id',$id)->get();
+        return $this->sendResponse($transactions,'All user transactions retreived Successfully.');
+    }
+
+    public function get_all_trans()
+    {
+        $transactions = PT::all();
+        return $this->sendResponse($transactions,'All transactions retreived Successfully.');
+    }
+
+    public function get_trans($id)
+    {
+        $transaction = PT::find($id);
+        return $this->sendResponse($transaction,'Transaction retreived Successfully.');
+    }
+
+
+
+
 
     public function charge2(Request $request)
     {

@@ -87,6 +87,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Payment API
     Route::post('/charge', [Payment::class,'charge'])->name('charge');
+    Route::get('/get/user/all/transactions/{id}', [Payment::class,'get_user_all_trans'])->name('get_user_all_trans');
+    Route::get('/get/all/transactions', [Payment::class,'get_all_trans'])->name('get_all_trans');
+    Route::get('/get/transaction/{id}', [Payment::class,'get_trans'])->name('get_trans');
 
     
     Route::get('/mark-product-sold/{id}',[Products::class,'mark_product_sold']);
