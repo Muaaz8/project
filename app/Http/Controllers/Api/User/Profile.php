@@ -106,8 +106,7 @@ class Profile extends Controller
     }
 
     public function selling_screen(){
-        // $id = JWTAuth::user()->id;
-        $id = 5;
+        $id = JWTAuth::user()->id;
 
         $sold = Product::where('user_id',$id)->where('is_sold',true)->get();
         $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
