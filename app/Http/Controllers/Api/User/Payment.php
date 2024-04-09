@@ -4,17 +4,64 @@ namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use App\Models\Payment as PT;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Stripe\Token;
 use Stripe\Charge;
 use Session;
-use Illuminate\Support\Facades\Http;
+use JWTAuth;
 
 class Payment extends Controller
 {
     public function charge(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'amount'            => 'required',
+            'currency'          => 'required',
+            'token'             => 'required',
+        ]);
+
+        $data = $request->all();
+
+        Stripe::setApiKey(env('STRIPE_TEST_SECRET'));
+
+        try {
+            // Create a charge
+            $payment =  Charge::create([
+                'amount' => $data['amount'], // Amount in cents
+                'currency' => $data['currency'],
+                'source' => $data['token'],
+                'description' => $request->description,
+            ]);
+            if($payment)
+            {
+                $input['user_id'] = JWTAuth::user()->id;
+                $input['transaction_id'] = $payment->source->id;
+                $input['amount'] = $data['amount'];
+                $input['currency'] = $data['currency'];
+                $input['token'] = $data['token'];
+                $input['last_four'] = $payment->source->last4;
+                $input['description'] = $request->description;
+                $input['receipt_url'] = $payment->receipt_url;
+                $input['status'] = $payment->status;
+                $input['brand'] = $payment->source->brand;
+                $pay = PT::create($input);
+                return $this->sendResponse($pay,'Payment Successfully.');
+            }else{
+                return $this->sendError('Something Went wrong',[],401);
+            }
+            // Payment successful
+            // return response()->json(['message' => 'Payment successful']);
+        } catch (\Exception $e) {
+            // Payment failed
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function charge2(Request $request)
     {
         Stripe::setApiKey(env('STRIPE_TEST_SECRET'));
 
@@ -38,45 +85,6 @@ class Payment extends Controller
         }
     }
 
-    public function charge2(Request $request)
-    {
-        $validator = Validator::make($request->all(),[
-            'amount'            => 'required',
-            'currency'          => 'required',
-            'type'              => 'required',
-            'card_number'       => 'required',
-            'exp_month'         => 'required',
-            'exp_year'          => 'required',
-            'cvc'               => 'required',
-        ]);
-
-        $data = $request->all();
-        $token = 'pm_card_visa_debit';
-
-        Stripe::setApiKey(env('STRIPE_SECRET'));
-
-        try {
-            // Create a charge
-            Charge::create([
-                'amount' => 1000, // Amount in cents
-                'currency' => 'usd',
-                'source' => [
-                    'object' => 'card',
-                    'number' => '4242424242424242',
-                    'exp_month' => $data['exp_month'],
-                    'exp_year' => $data['exp_year'],
-                    'cvc' => $data['cvc'],
-                ],
-                'description' => 'Example Charge',
-            ]);
-
-            // Payment successful
-            return response()->json(['message' => 'Payment successful']);
-        } catch (\Exception $e) {
-            // Payment failed
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
-    }
     public function charge1(Request $request)
     {
         $validator = Validator::make($request->all(),[
