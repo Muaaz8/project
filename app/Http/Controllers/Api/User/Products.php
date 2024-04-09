@@ -103,8 +103,21 @@ class Products extends Controller
                 $product->mileage = $request->mileage;
             }
             if ($request->has('color')) {
-                $product->mileage = $request->color;
+                $product->color = $request->color;
             }
+            if ($request->has('brand')) {
+                $product->brand = $request->brand;
+            }
+            if ($request->has('model')) {
+                $product->model = $request->model;
+            }
+            if ($request->has('edition')) {
+                $product->edition = $request->edition;
+            }
+            if ($request->has('authenticity')) {
+                $product->authenticity = $request->authenticity;
+            }
+
             $product->save();
             return response()->json([
                 'status' => 'success',
