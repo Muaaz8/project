@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "stevebauman/location": "^7.2",
+        "stripe/stripe-php": "^13.17",
         "tymon/jwt-auth": "2.0"
     },
     "require-dev": {

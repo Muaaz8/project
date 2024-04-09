@@ -12,6 +12,7 @@ use App\Http\Controllers\Front\AuctionController;
 use App\Http\Controllers\Front\MakeOfferController;
 use App\Http\Controllers\Api\User\WishlistController;
 use App\Http\Controllers\Api\User\Profile;
+use App\Http\Controllers\Api\User\Payment;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -83,4 +84,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Add Review to Product Routes
     Route::post('/product-review',[Products::class,'product_review']);
+
+    //Payment API
+    Route::post('/charge', [Payment::class,'charge'])->name('charge');
+
 });
