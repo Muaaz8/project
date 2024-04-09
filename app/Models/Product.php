@@ -33,6 +33,9 @@ class Product extends Model
         'is_urgent',
         'total_review',
         'review_percentage',
+        'is_archived',
+        'is_sold',
+        'sold_to_user_id',
     ];
 
     public function user(){
