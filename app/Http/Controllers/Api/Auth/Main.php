@@ -124,7 +124,6 @@ class Main extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'username' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
             'password' => 'required|min:3',
         ]);
 
@@ -135,27 +134,52 @@ class Main extends Controller
             ], 401); // Bad Request
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'status' => 1,
-            'provider' => 'site',
-            'src' => 'app',
-            'password' => Hash::make($request->password),
-        ]);
-        $data = User::where('id',$user->id)->first();
+        if(isset($request->email)){
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'status' => 1,
+                'provider' => 'site',
+                'src' => 'app',
+                'password' => Hash::make($request->password),
+            ]);
+            $data = User::where('id',$user->id)->first();
 
-        $credentials['email']    = $request->email;
-        $credentials['password']    = $request->password;
+            $credentials['email']    = $request->email;
+            $credentials['password']    = $request->password;
 
-        try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+            try {
+                if (! $token = JWTAuth::attempt($credentials)) {
+                    return response()->json(['error' => 'Unauthorized'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Could not create token'], 500);
             }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+        }elseif(isset($request->phone)){
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'phone' => $request->phone,
+                'status' => 1,
+                'provider' => 'site',
+                'src' => 'app',
+                'password' => Hash::make($request->password),
+            ]);
+            $data = User::where('id',$user->id)->first();
+
+            $credentials['email']    = $request->email;
+            $credentials['password']    = $request->password;
+
+            try {
+                if (! $token = JWTAuth::attempt($credentials)) {
+                    return response()->json(['error' => 'Unauthorized'], 401);
+                }
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'Could not create token'], 500);
+            }
         }
+
 
         $return['user']   = $data;
         $return['token']  = $token;

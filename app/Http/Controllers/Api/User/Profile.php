@@ -106,8 +106,7 @@ class Profile extends Controller
     }
 
     public function selling_screen(){
-        // $id = JWTAuth::user()->id;
-        $id = 5;
+        $id = JWTAuth::user()->id;
 
         $sold = Product::where('user_id',$id)->where('is_sold',true)->get();
         $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
@@ -116,4 +115,27 @@ class Profile extends Controller
         $data = ['sold'=>$sold, 'purchase'=> $purchase, 'archive'=> $archive];
         return $this->sendResponse($data,'User Retrived Successfully.');
     }
+
+    public function user_review(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'review_quantity' => 'required|max:5|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user = User::where('id', $request->user_id)->first();
+
+        if ($user->review_percentage == 0) {
+            $rating = $request->review_quantity;
+        } else {
+            $rating = ($request->review_quantity+$user->review_percentage)/2;
+        }
+        $user->review_percentage = $rating;
+        $user->total_review++;
+        $user->save();
+        return $this->sendResponse($user,'Review Added Successfully.');
+    }
+
 }

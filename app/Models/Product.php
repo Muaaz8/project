@@ -36,6 +36,10 @@ class Product extends Model
         'is_archived',
         'is_sold',
         'sold_to_user_id',
+        'brand',
+        'model',
+        'edition',
+        'authenticity',
     ];
 
     public function user(){
