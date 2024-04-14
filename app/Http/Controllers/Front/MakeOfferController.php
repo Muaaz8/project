@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Front;
 
 use Illuminate\Http\Request;
+use App\Models\Notification;
 use App\Models\MakeOffer;
+use App\Models\User;
+use App\Models\Chat as Ch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -44,7 +47,7 @@ class MakeOfferController extends Controller
         $notif = Notification::create($notification);
 
         $e = new Chat();
-        $e->firebase_notification($receiver_id,$notif);
+        $e->firebase_notification($receiver->id,$notif);
 
         return $this->sendResponse($offer,"Offer Made placed Successfully");
     }
