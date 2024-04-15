@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Models\MakeOffer;
 use App\Models\User;
+use App\Models\Product;
 use App\Models\Chat as Ch;
 
 use App\Http\Controllers\Controller;
@@ -38,15 +39,24 @@ class MakeOfferController extends Controller
         }
         $sender = User::find($request->buyer_id);
         $receiver = User::find($request->seller_id);
+        $prod = Product::find($request->product_id);
+
+        $ch_input['sender_id'] = $sender->id;
+        $ch_input['receiver_id'] = $receiver->id;
+        $ch_input['message'] = $sender->name." made an offer ".$request->offer_price." for your listed product ".$prod->name;
+        $ch_input['status'] = "sent";
+        $ch_input['conversation_id'] = $conversation_id;
+        $msg = Ch::Create($ch_input);
         $noti_text = $sender->name." made an offer for your listed product.";
         $notification['user_id'] = $receiver->id;
         $notification['text'] = $noti_text;
-        $notification['type'] = "offer";
+        $notification['type'] = "conversation";
         $notification['type_id'] = $conversation_id;
         $notification['status'] = "unread";
         $notif = Notification::create($notification);
 
         $e = new Chat();
+        $e->firebase($receiver->id,$sender->id,$ch_input);
         $e->firebase_notification($receiver->id,$notif);
 
         return $this->sendResponse($offer,"Offer Made placed Successfully");
