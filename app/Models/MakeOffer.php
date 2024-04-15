@@ -12,7 +12,8 @@ class MakeOffer extends Model
         'product_id',
         'seller_id',
         'buyer_id',
-        'offer_price'
+        'offer_price',
+        'status',
     ];
 
     public function product(){

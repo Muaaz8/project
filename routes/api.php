@@ -81,6 +81,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     // Make Offer Routes
     Route::post('/make-offer', [MakeOfferController::class,'make_offer']);
     Route::post('/get-offer', [MakeOfferController::class,'get_offer']);
+    Route::post('/accept-offer', [MakeOfferController::class,'accept_offer']);
+    Route::post('/reject-offer', [MakeOfferController::class,'reject_offer']);
 
     //Add Review to Product Routes
     Route::post('/product-review',[Products::class,'product_review']);
