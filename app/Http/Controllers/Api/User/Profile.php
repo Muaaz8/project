@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\ReportUsers;
+use App\Models\BlockedUsers;
 use JWTAuth;
 use Hash;
 use App\Models\Product;
@@ -160,9 +161,25 @@ class Profile extends Controller
         return $this->sendResponse($report,'Reported Users Retrived Successfully.');
     }
 
-    // public function list_reported_user(){
-    //     $report = ReportUsers::all();
-    //     return $this->sendResponse($report,'Reported Users Retrived Successfully.');
-    // }
+    public function block_user(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $report = BlockedUsers::create([
+            'blocker_user_id' => JWTAuth::user()->id,
+            'blocked_user_id' => $request->user_id,
+        ]);
+        return $this->sendResponse($report,'User Reported Successfully.');
+    }
+
+    public function list_blocked_user(){
+        $block = BlockedUsers::with(['blocker','blocked'])->get();
+        return $this->sendResponse($block,'Blocked Users Retrived Successfully.');
+    }
 
 }

@@ -102,4 +102,6 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/report-a-user',[Profile::class,'report_user']);
     Route::get('/list-report-a-user',[Profile::class,'list_reported_user']);
 
+    Route::post('/block-a-user',[Profile::class,'block_user']);
+    Route::get('/list-block-a-user',[Profile::class,'list_blocked_user']);
 });
