@@ -98,4 +98,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/mark-product-sold/{id}',[Products::class,'mark_product_sold']);
     Route::get('/mark-product-archive/{id}',[Products::class,'mark_product_archive']);
     Route::get('/selling-screen',[Profile::class,'selling_screen']);
+
+    Route::post('/report-a-user',[Profile::class,'report_user']);
+    Route::get('/list-report-a-user',[Profile::class,'list_reported_user']);
+
 });

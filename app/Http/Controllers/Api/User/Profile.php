@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Models\ReportUsers;
 use JWTAuth;
 use Hash;
 use App\Models\Product;
@@ -137,5 +138,31 @@ class Profile extends Controller
         $user->save();
         return $this->sendResponse($user,'Review Added Successfully.');
     }
+
+    public function report_user(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $report = ReportUsers::create([
+            'reporter_user_id' => JWTAuth::user()->id,
+            'reported_user_id' => $request->user_id,
+        ]);
+        return $this->sendResponse($report,'User Reported Successfully.');
+    }
+
+    public function list_reported_user(){
+        $report = ReportUsers::with(['reporter','reported'])->get();
+        return $this->sendResponse($report,'Reported Users Retrived Successfully.');
+    }
+
+    // public function list_reported_user(){
+    //     $report = ReportUsers::all();
+    //     return $this->sendResponse($report,'Reported Users Retrived Successfully.');
+    // }
 
 }
