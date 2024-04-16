@@ -177,6 +177,19 @@ class Profile extends Controller
         return $this->sendResponse($report,'User Reported Successfully.');
     }
 
+    public function unblock_user(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $report = BlockedUsers::where('blocker_user_id',JWTAuth::user()->id)->where('blocked_user_id', $request->user_id)->delete();
+        return $this->sendResponse($report,'User Unblocked Successfully.');
+    }
+
     public function list_blocked_user(){
         $block = BlockedUsers::with(['blocker','blocked'])->get();
         return $this->sendResponse($block,'Blocked Users Retrived Successfully.');

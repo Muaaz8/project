@@ -55,7 +55,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/upload-image', [Products::class,'upload_image']);
 
     // Chatting Routes
-    Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
+    Route::middleware(['blockeduser'])->group(function () {
+        Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
+    });
     Route::get('/get/user/all/chats/{id}', [Chat::class, 'get_all_chats_of_user'])->name('get_all_chats_of_user');
     Route::get('/get/conversation/{conversation_id}', [Chat::class, 'get_conversation'])->name('get_conversation');
     Route::get('/delete/message/{message_id}', [Chat::class, 'delete_message'])->name('delete_message');
@@ -103,5 +105,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/list-report-a-user',[Profile::class,'list_reported_user']);
 
     Route::post('/block-a-user',[Profile::class,'block_user']);
+    Route::post('/unblock-a-user',[Profile::class,'unblock_user']);
     Route::get('/list-block-a-user',[Profile::class,'list_blocked_user']);
+
 });

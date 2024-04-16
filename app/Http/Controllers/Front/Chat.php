@@ -11,6 +11,7 @@ use App\Models\User;
 use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\ServiceAccount;
 use Illuminate\Support\Facades\Validator;
+use App\Models\BlockedUsers;
 
 class Chat extends Controller
 {
@@ -171,6 +172,15 @@ class Chat extends Controller
         foreach ($chats as $key => $chat) {
             $chat->sender = User::find($chat->sender_id);
             $chat->receiver = User::find($chat->receiver_id);
+            $block = BlockedUsers::where('blocker_user_id',$chat->sender->id)->where('blocked_user_id',$chat->receiver->id)->first();
+            $blocked = BlockedUsers::where('blocker_user_id',$chat->receiver->id)->where('blocked_user_id',$chat->sender->id)->first();
+            if($block){
+               $chat->block = 1;
+            }elseif ($blocked) {
+                $chat->block = 1;
+            }else{
+                $chat->block = 0;
+            }
         }
         return $this->sendResponse($chats,'Retreived All Chats of user Successfully.');
     }
