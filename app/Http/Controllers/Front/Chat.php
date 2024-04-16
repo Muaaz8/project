@@ -12,6 +12,7 @@ use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\ServiceAccount;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BlockedUsers;
+use DB;
 
 class Chat extends Controller
 {
@@ -168,7 +169,17 @@ class Chat extends Controller
 
     public function get_all_chats_of_user($id)
     {
-        $chats = Ch::where('sender_id',$id)->orwhere('receiver_id',$id)->groupby('conversation_id')->get();
+        // $chats = Ch::where('sender_id',$id)->orwhere('receiver_id',$id)->groupby('conversation_id')->get();
+        $chats = Ch::whereIn('id', function($query) use ($id) {
+            $query->select(DB::raw('MAX(id)'))
+                  ->from('chats')
+                  ->where('sender_id', $id)
+                  ->orWhere('receiver_id', $id)
+                  ->groupBy('conversation_id');
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
         foreach ($chats as $key => $chat) {
             $chat->sender = User::find($chat->sender_id);
             $chat->receiver = User::find($chat->receiver_id);
