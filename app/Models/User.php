@@ -36,6 +36,8 @@ class User extends Authenticatable implements JWTSubject
         'image_verified_at',
         'total_review',
         'review_percentage',
+        'location',
+        'custom_link',
     ];
 
     /**

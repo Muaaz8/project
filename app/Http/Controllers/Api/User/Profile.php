@@ -27,6 +27,116 @@ class Profile extends Controller
         return $this->sendResponse($user,'User Retrived Successfully.');
     }
 
+    public function update_user_name(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+
+        $user = User::find($user_id);
+        $user->name = $request->name;
+        $user->save();
+        return $this->sendResponse($user,'User Retrived Successfully.');
+    }
+
+    public function update_phone_number(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'phone' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+
+        $user = User::find($user_id);
+        $user->phone = $request->phone;
+        $user->save();
+        return $this->sendResponse($user,'User Retrived Successfully.');
+    }
+
+    public function update_email(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'email' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+
+        $user = User::find($user_id);
+        $user->email = $request->email;
+        $user->save();
+        return $this->sendResponse($user,'User Retrived Successfully.');
+    }
+
+    public function update_password(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'old_password' => 'required',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+        $user = User::find($user_id);
+
+        $credentials['email']    = $user->email;
+        $credentials['password']    = $request->old_password;
+
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Old Password Does not Matched!'], 401);
+        }else{
+            $user->password = Hash::make($request->password);
+            $user->save();
+            return $this->sendResponse($user,'User Password Changed Successfully.');
+        }
+    }
+
+    public function update_location(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'location' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+
+        $user = User::find($user_id);
+        $user->location = $request->location;
+        $user->save();
+        return $this->sendResponse($user,'User Retrived Successfully.');
+    }
+
+    public function update_custom_link(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'custom_link' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+        $user_id = JWTAuth::user()->id;
+
+        $user = User::find($user_id);
+        $user->custom_link = $request->custom_link;
+        $user->save();
+        return $this->sendResponse($user,'User Retrived Successfully.');
+    }
+
     public function get_all_users()
     {
         $user = User::all();
@@ -110,7 +220,7 @@ class Profile extends Controller
     public function selling_screen(){
         $id = JWTAuth::user()->id;
 
-        $sold = Product::where('user_id',$id)->where('is_sold',true)->get();
+        $selling = Product::where('user_id',$id)->where('status',1)->get();
         $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
         $purchase = Product::where('user_id',$id)->where('sold_to_user_id',$id)->get();
 

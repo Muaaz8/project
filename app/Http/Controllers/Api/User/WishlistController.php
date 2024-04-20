@@ -10,7 +10,7 @@ class WishlistController extends Controller
 {
     public function index(Request $request)
     {
-        $wishlist_products = Wishlist::with(['user','product'])->where('user_id',$request->user_id)->get();
+        $wishlist_products = Wishlist::with(['user','product','product.photo'])->where('user_id',$request->user_id)->get();
         return $this->sendResponse($wishlist_products,'Wishlist Products Retrived Successfully.');
     }
 

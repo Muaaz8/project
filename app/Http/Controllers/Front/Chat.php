@@ -196,6 +196,30 @@ class Chat extends Controller
         return $this->sendResponse($chats,'Retreived All Chats of user Successfully.');
     }
 
+    public function get_conversation_id(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sender_id'     => 'required|exists:users,id',
+            'receiver_id'   => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $chat = Ch::where('sender_id',$request->sender_id)->where('receiver_id',$request->receiver_id)->first();
+        $chat1 = Ch::where('sender_id',$request->receiver_id)->where('receiver_id',$request->sender_id)->first();
+        if($chat){
+            $conversation_id = $chat->conversation_id;
+        }elseif($chat1){
+            $conversation_id = $chat->conversation_id;
+        }else{
+            $conversation_id = date('YmdHis');
+        }
+
+        return $this->sendResponse($conversation_id,'Retreived Conversation of user Successfully.');
+    }
+
     public function get_conversation($conversation_id)
     {
         $conversation = Ch::where('conversation_id',$conversation_id)->get();

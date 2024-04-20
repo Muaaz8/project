@@ -40,6 +40,12 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/user/info/{id}',[Profile::class, 'user_info'])->name('user_info');
     Route::get('/get/all/users',[Profile::class, 'get_all_users'])->name('get_all_users');
     Route::post('/update/user',[Profile::class, 'update_user'])->name('update_user');
+    Route::post('/update/user/name',[Profile::class, 'update_user_name'])->name('update_user_name');
+    Route::post('/update/email',[Profile::class, 'update_email'])->name('update_email');
+    Route::post('/update/phone/number',[Profile::class, 'update_phone_number'])->name('update_phone_number');
+    Route::post('/update/password',[Profile::class, 'update_password'])->name('update_password');
+    Route::post('/update/location',[Profile::class, 'update_location'])->name('update_location');
+    Route::post('/update/custom/link',[Profile::class, 'update_custom_link'])->name('update_custom_link');
 
     // Listing Products Routes
     Route::post('/categories', [Category::class,'index']);
@@ -58,6 +64,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::middleware(['blockeduser'])->group(function () {
         Route::post('send_msg', [Chat::class, 'send_msg'])->name('send_msg');
     });
+    Route::post('/get/conversation_id', [Chat::class, 'get_conversation_id'])->name('get_conversation_id');
     Route::get('/get/user/all/chats/{id}', [Chat::class, 'get_all_chats_of_user'])->name('get_all_chats_of_user');
     Route::get('/get/conversation/{conversation_id}', [Chat::class, 'get_conversation'])->name('get_conversation');
     Route::get('/delete/message/{message_id}', [Chat::class, 'delete_message'])->name('delete_message');
