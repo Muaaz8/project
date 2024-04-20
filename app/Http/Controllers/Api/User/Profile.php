@@ -154,7 +154,8 @@ class Profile extends Controller
         }
 
         $id = $request->user_id;
-        $data = $request->only('name','provider','provider_id','provider_token','phone','status','email','username','password','src');
+        $data = $request->all();
+        // $data = $request->only('name','provider','provider_id','provider_token','phone','status','email','username','password','src');
         // $data = $request->except('img','src','user_id','email','username','code','email_verified_at','phone_verified_at','');
 
         if($request->has('email')){
