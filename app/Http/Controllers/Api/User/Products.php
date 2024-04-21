@@ -418,4 +418,62 @@ class Products extends Controller
         $product->save();
         return $this->sendResponse($product,'Product Marked Archived Successfully.');
     }
+
+    public function all_products(Request $request){
+        $query = Product::with(['user','category','sub_category','photo','video','wishlist' => function($query) {
+            $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
+        }])
+        ->where('status','1')
+        ->where('is_archived',false)
+        ->where('is_sold',false);
+
+        if ($request->filled('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('title', 'LIKE', "%{$request->search}%");
+        }
+
+        if ($request->filled('limit')) {
+            $query->limit($request->limit);
+        }
+
+        if ($request->filled('location')) {
+            $query->where('location','LIKE',"%{$request->location}%");
+        }
+        if ($request->filled('sort_by')) {
+            if(Str::lower($request->sort_by) == "newest on top"){
+                $query->orderby('id','desc');
+            }elseif(Str::lower($request->sort_by) == "newest on bottom"){
+                $query->orderby('id','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on top"){
+                $query->orderby('fix_price','asc');
+            }elseif(Str::lower($request->sort_by) == "lowest price on bottom"){
+                $query->orderby('fix_price','desc');
+            }
+        }
+        if ($request->filled('is_urgert')) {
+            $query->where('is_urgert',$request->is_urgert);
+        }
+        if ($request->filled('min_price')) {
+            $query->where('fix_price','>=',$request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('fix_price','<=',$request->max_price);
+        }
+
+        $featured_products = $query->get();
+
+        return $this->sendResponse($featured_products,'All Products Retrived Successfully.');
+    }
 }

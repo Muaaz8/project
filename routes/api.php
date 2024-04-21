@@ -52,6 +52,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/sub-categories', [Category::class,'sub_category']);
     Route::post('/featured-products', [Products::class,'featured_products']);
     Route::post('/auction-products', [Products::class,'auction_products']);
+    Route::post('/get-all-products', [Products::class,'all_products']);
 
     // Product upload steps
     Route::post('/add-product-first-step', [Products::class,'first_step']);
