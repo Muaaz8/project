@@ -134,6 +134,11 @@ class Main extends Controller
             ], 401); // Bad Request
         }
 
+        $is_true_you = 0;
+        if(isset($request->is_true_you)){
+            $is_true_you = $request->is_true_you;
+        }
+
         if(isset($request->email)){
             $user = User::create([
                 'name' => $request->name,
@@ -142,6 +147,7 @@ class Main extends Controller
                 'status' => 1,
                 'provider' => 'site',
                 'src' => 'app',
+                'is_true_you' => $is_true_you,
                 'password' => Hash::make($request->password),
             ]);
             $data = User::where('id',$user->id)->first();
@@ -164,6 +170,7 @@ class Main extends Controller
                 'status' => 1,
                 'provider' => 'site',
                 'src' => 'app',
+                'is_true_you' => $is_true_you,
                 'password' => Hash::make($request->password),
             ]);
             $data = User::where('id',$user->id)->first();
