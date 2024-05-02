@@ -225,7 +225,7 @@ class Profile extends Controller
         $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
         $purchase = Product::where('user_id',$id)->where('sold_to_user_id',$id)->get();
 
-        $data = ['sold'=>$sold, 'purchase'=> $purchase, 'archive'=> $archive];
+        $data = ['selling'=>$selling, 'purchase'=> $purchase, 'archive'=> $archive];
         return $this->sendResponse($data,'User Retrived Successfully.');
     }
 
