@@ -221,9 +221,9 @@ class Profile extends Controller
     public function selling_screen(){
         $id = JWTAuth::user()->id;
 
-        $selling = Product::where('user_id',$id)->where('status',1)->get();
-        $archive = Product::where('user_id',$id)->where('is_archived',true)->get();
-        $purchase = Product::where('user_id',$id)->where('sold_to_user_id',$id)->get();
+        $selling = Product::with(['user','category','sub_category','photo','video','wishlist'])->where('user_id',$id)->where('status',1)->get();
+        $archive = Product::with(['user','category','sub_category','photo','video','wishlist'])->where('user_id',$id)->where('is_archived',true)->get();
+        $purchase = Product::with(['user','category','sub_category','photo','video','wishlist'])->where('user_id',$id)->where('sold_to_user_id',$id)->get();
 
         $data = ['selling'=>$selling, 'purchase'=> $purchase, 'archive'=> $archive];
         return $this->sendResponse($data,'User Retrived Successfully.');
