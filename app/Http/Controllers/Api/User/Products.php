@@ -419,6 +419,19 @@ class Products extends Controller
         return $this->sendResponse($product,'Product Marked Archived Successfully.');
     }
 
+    public function mark_product_unarchive($id){
+        $product = Product::find($id);
+        if(!$product) {
+            return $this->sendError('Product not Found',[],401);
+        }
+
+        $product->status = "1";
+        $product->is_archived = false;
+        $product->is_sold = false;
+        $product->save();
+        return $this->sendResponse($product,'Product Unarchived Successfully.');
+    }
+
     public function all_products(Request $request){
         $query = Product::with(['user','category','sub_category','photo','video','wishlist' => function($query) {
             $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
