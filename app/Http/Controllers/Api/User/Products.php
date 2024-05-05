@@ -419,6 +419,19 @@ class Products extends Controller
         return $this->sendResponse($product,'Product Marked Archived Successfully.');
     }
 
+    public function mark_product_unarchive($id){
+        $product = Product::find($id);
+        if(!$product) {
+            return $this->sendError('Product not Found',[],401);
+        }
+
+        $product->status = "1";
+        $product->is_archived = false;
+        $product->is_sold = false;
+        $product->save();
+        return $this->sendResponse($product,'Product Unarchived Successfully.');
+    }
+
     public function all_products(Request $request){
         $query = Product::with(['user','category','sub_category','photo','video','wishlist' => function($query) {
             $query->where('user_id', JWTAuth::user()->id); // Replace $specificWishlistId with the ID you want to filter
@@ -475,5 +488,27 @@ class Products extends Controller
         $featured_products = $query->get();
 
         return $this->sendResponse($featured_products,'All Products Retrived Successfully.');
+    }
+
+    public function increase_product_view(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:product,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $prod = Product::find($request->product_id);
+        if($prod->views_count == null)
+        {
+            $prod->views_count = 1;
+            $prod->save();
+        }else{
+            $prod->views_count = (int)$prod->views_count + 1;
+            $prod->save();
+        }
+
+        return $this->sendResponse($prod,'Product View Increased Successfully.');
     }
 }

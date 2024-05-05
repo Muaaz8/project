@@ -46,6 +46,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/update/password',[Profile::class, 'update_password'])->name('update_password');
     Route::post('/update/location',[Profile::class, 'update_location'])->name('update_location');
     Route::post('/update/custom/link',[Profile::class, 'update_custom_link'])->name('update_custom_link');
+    Route::post('/verify-email',[Profile::class, 'verify_email'])->name('verify_email');
+    Route::post('/verify-email-otp',[Profile::class, 'verify_email_otp'])->name('verify_email_otp');
 
     // Listing Products Routes
     Route::post('/categories', [Category::class,'index']);
@@ -107,7 +109,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     Route::get('/mark-product-sold/{id}',[Products::class,'mark_product_sold']);
     Route::get('/mark-product-archive/{id}',[Products::class,'mark_product_archive']);
+    Route::get('/mark-product-unarchive/{id}',[Products::class,'mark_product_unarchive']);
     Route::get('/selling-screen',[Profile::class,'selling_screen']);
+    Route::post('/increase-product-view',[Products::class,'increase_product_view']);
 
     Route::post('/report-a-user',[Profile::class,'report_user']);
     Route::get('/list-report-a-user',[Profile::class,'list_reported_user']);

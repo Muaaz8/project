@@ -12,10 +12,10 @@ class Notification extends Controller
     {
         $type = request('type');
         if($type){
-            $notifications = Nt::where('user_id',$id)->where('type',$type)->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->where('type',$type)->get();
             return $this->sendResponse($notifications,'All User Notifications Retreived Successfully.');
         }else{
-            $notifications = Nt::where('user_id',$id)->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->get();
             return $this->sendResponse($notifications,'All User Notifications Retreived Successfully.');
         }
     }
@@ -25,10 +25,10 @@ class Notification extends Controller
 
         $type = request('type');
         if($type){
-            $notifications = Nt::where('user_id',$id)->where('type',$type)->where('status','unread')->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->where('type',$type)->where('status','unread')->get();
             return $this->sendResponse($notifications,'All Unread User Notifications Retreived Successfully.');
         }else{
-            $notifications = Nt::where('user_id',$id)->where('status','unread')->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->where('status','unread')->get();
             return $this->sendResponse($notifications,'All Unread User Notifications Retreived Successfully.');
         }
     }
@@ -37,10 +37,10 @@ class Notification extends Controller
     {
         $type = request('type');
         if($type){
-            $notifications = Nt::where('user_id',$id)->where('type',$type)->where('status','read')->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->where('type',$type)->where('status','read')->get();
             return $this->sendResponse($notifications,'All Read User Notifications Retreived Successfully.');
         }else{
-            $notifications = Nt::where('user_id',$id)->where('status','read')->get();
+            $notifications = Nt::with(['user'])->where('user_id',$id)->where('status','read')->get();
             return $this->sendResponse($notifications,'All Read User Notifications Retreived Successfully.');
         }
     }

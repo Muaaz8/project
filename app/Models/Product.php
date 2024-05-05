@@ -40,6 +40,7 @@ class Product extends Model
         'model',
         'edition',
         'authenticity',
+        'views_count',
     ];
 
     public function user(){

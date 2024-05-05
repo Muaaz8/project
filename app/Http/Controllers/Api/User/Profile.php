@@ -11,6 +11,8 @@ use App\Models\ReportUsers;
 use App\Models\BlockedUsers;
 use JWTAuth;
 use Hash;
+use Mail;
+use App\Mail\VerifyEmail;
 use App\Models\Product;
 
 class Profile extends Controller
@@ -304,6 +306,80 @@ class Profile extends Controller
     public function list_blocked_user(){
         $block = BlockedUsers::with(['blocker','blocked'])->get();
         return $this->sendResponse($block,'Blocked Users Retrived Successfully.');
+    }
+
+    public function verify_email(Request $request)
+    {
+        $validator_a = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+        if ($validator_a->fails()) {
+            return response()->json([
+                  'status' => 'error',
+                  'msg' => $validator_a->errors(),
+            ], 401);
+        }
+        $data = User::where('email', $request->email)
+            ->first();
+        if ($data) {
+            $code = rand(100000, 999999);
+            $data->email_code = $code;
+            $data->save();
+            $mailData = [
+                'title' => 'Email Verification Code',
+                'body' => $code,
+            ];
+            Mail::to($data->email)->send(new VerifyEmail($mailData));
+              return response()->json([
+                  'status' => 'success',
+                'msg' => 'We have sent an Email Verification otp code to your email',
+                'otp' => $code,
+                'data' => $data,
+              ], 200);
+        } else {
+            return response()->json([
+              'status' => 'error',
+              'msg' => "Email doesn't exist!",
+            ], 401);
+        }
+    }
+
+    public function verify_email_otp(Request $request)
+    {
+        $validator_a = Validator::make($request->all(), [
+            'otp' => 'required',
+            'user_id' => 'required',
+        ]);
+        if ($validator_a->fails()) {
+            return response()->json([
+                  'status' => 'error',
+                  'msg' => $validator_a->errors(),
+            ], 401);
+        }
+
+        $user = User::find($request->user_id);
+        if($user)
+        {
+            if($user->email_code == $request->otp)
+            {
+                $user->email_verified_at = date('Y-m-d H:i:s');
+                $user->save();
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => 'Email Verified Successfully.',
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => 'error',
+                    'msg' => 'Invalid Code.',
+                ], 401);
+            }
+        }else{
+            return response()->json([
+                'status' => 'error',
+                'msg' => 'User Does not exist.',
+            ], 401);
+        }
     }
 
 }
