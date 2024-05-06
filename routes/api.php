@@ -101,6 +101,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/user-review',[Profile::class,'user_review']);
 
     //Payment API
+    Route::post('/sell-faster', [Payment::class,'sell_faster'])->name('sell_faster');
     Route::post('/charge', [Payment::class,'charge'])->name('charge');
     Route::get('/get/user/all/transactions/{id}', [Payment::class,'get_user_all_trans'])->name('get_user_all_trans');
     Route::get('/get/all/transactions', [Payment::class,'get_all_trans'])->name('get_all_trans');

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Payment as PT;
+use App\Models\Product;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Stripe\Token;
@@ -49,6 +50,65 @@ class Payment extends Controller
                 $input['status'] = $payment->status;
                 $input['brand'] = $payment->source->brand;
                 $pay = PT::create($input);
+                return $this->sendResponse($pay,'Payment Successfully.');
+            }else{
+                return $this->sendError('Something Went wrong',[],401);
+            }
+            // Payment successful
+            // return response()->json(['message' => 'Payment successful']);
+        } catch (\Exception $e) {
+            // Payment failed
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function sell_faster(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'product_id'        => 'required',
+            'number_of_days'    => 'required',
+            'amount'            => 'required',
+            'currency'          => 'required',
+            'token'             => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $validator->errors(),
+            ], 401);
+        };
+
+        $data = $request->all();
+
+        Stripe::setApiKey(env('STRIPE_TEST_SECRET'));
+
+        try {
+            // Create a charge
+            $payment =  Charge::create([
+                'amount' => $data['amount']*100, // Amount in cents
+                'currency' => $data['currency'],
+                'source' => $data['token'],
+                'description' => $request->description,
+            ]);
+            if($payment)
+            {
+                $input['user_id'] = JWTAuth::user()->id;
+                $input['transaction_id'] = $payment->source->id;
+                $input['amount'] = $data['amount']*100;
+                $input['currency'] = $data['currency'];
+                $input['token'] = $data['token'];
+                $input['last_four'] = $payment->source->last4;
+                $input['description'] = $request->description;
+                $input['receipt_url'] = $payment->receipt_url;
+                $input['status'] = $payment->status;
+                $input['brand'] = $payment->source->brand;
+                $pay = PT::create($input);
+
+                $product = Product::find($request->product_id);
+                $product->booster_start_datetime = date('Y-m-d H:i:s');
+                $product->booster_end_datetime = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s').'+'.$request->number_of_days.'days'));
+                $product->save();
                 return $this->sendResponse($pay,'Payment Successfully.');
             }else{
                 return $this->sendError('Something Went wrong',[],401);
@@ -120,14 +180,14 @@ class Payment extends Controller
         ]);
         $data = $request->all();
         Stripe::setApiKey(env('STRIPE_SECRET'));
-    
+
         Charge::create ([
                 "amount" => 100 * 100,
                 "currency" => "usd",
                 "source" => $request->stripeToken,
-                "description" => "Test payment from itsolutionstuff.com." 
+                "description" => "Test payment from itsolutionstuff.com."
         ]);
-      
+
         Session::flash('success', 'Payment successful!');
 
         // $formData = http_build_query([
@@ -185,7 +245,7 @@ class Payment extends Controller
                     'exp_month' => $data['exp_month'],
                     'exp_year' => $data['exp_year'],
                     'cvc' => $data['cvc'],
-                ],  
+                ],
             ]);
             dd($stripe);
 

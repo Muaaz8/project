@@ -41,6 +41,8 @@ class Product extends Model
         'edition',
         'authenticity',
         'views_count',
+        'booster_start_datetime',
+        'booster_end_datetime',
     ];
 
     public function user(){

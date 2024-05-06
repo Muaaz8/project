@@ -260,7 +260,8 @@ class Products extends Controller
         ->where('fix_price','!=',null)
         ->where('status','1')
         ->where('is_archived',false)
-        ->where('is_sold',false);
+        ->where('is_sold',false)
+        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -319,7 +320,9 @@ class Products extends Controller
         ->where('auction_price','!=',null)
         ->where('status','1')
         ->where('is_archived',false)
-        ->where('is_sold',false);
+        ->where('is_sold',false)
+        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
+
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -438,7 +441,9 @@ class Products extends Controller
         }])
         ->where('status','1')
         ->where('is_archived',false)
-        ->where('is_sold',false);
+        ->where('is_sold',false)
+        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
+
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
