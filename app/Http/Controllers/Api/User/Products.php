@@ -13,6 +13,7 @@ use App\Models\Photo;
 use App\Models\Video;
 use App\Models\Categories;
 use App\Models\Sub_Category;
+use Illuminate\Support\Facades\DB;
 
 class Products extends Controller
 {
@@ -261,7 +262,8 @@ class Products extends Controller
         ->where('status','1')
         ->where('is_archived',false)
         ->where('is_sold',false)
-        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
+        ->orderBy(DB::raw('CASE WHEN booster_end_datetime >= NOW() THEN 0 ELSE 1 END'));
+        // ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
 
         if ($request->filled('id')) {
             $query->where('id', $request->id);
@@ -321,7 +323,8 @@ class Products extends Controller
         ->where('status','1')
         ->where('is_archived',false)
         ->where('is_sold',false)
-        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
+        ->orderBy(DB::raw('CASE WHEN booster_end_datetime >= NOW() THEN 0 ELSE 1 END'));
+        // ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
 
 
         if ($request->filled('id')) {
@@ -442,7 +445,8 @@ class Products extends Controller
         ->where('status','1')
         ->where('is_archived',false)
         ->where('is_sold',false)
-        ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
+        ->orderBy(DB::raw('CASE WHEN booster_end_datetime >= NOW() THEN 0 ELSE 1 END'));
+        // ->orderByRaw('ISNULL(booster_start_datetime), booster_start_datetime ASC');
 
 
         if ($request->filled('id')) {
