@@ -61,6 +61,10 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/add-product-second-step', [Products::class,'second_step']);
     Route::post('/add-product-third-step', [Products::class,'third_step']);
     Route::post('/add-product-last-step', [Products::class,'last_step']);
+    Route::post('/edit-product-first-step', [Products::class,'edit_product_first_step']);
+    Route::post('/edit-product-second-step', [Products::class,'second_step']);
+    Route::post('/edit-product-third-step', [Products::class,'third_step']);
+    Route::post('/edit-product-last-step', [Products::class,'last_step']);
     Route::post('/upload-image', [Products::class,'upload_image']);
 
     // Chatting Routes

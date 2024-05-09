@@ -124,7 +124,7 @@ class Main extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'username' => 'required|unique:users',
-            'password' => 'required|min:3',
+            'password' => 'required|min:8',
         ]);
 
         if ($validator->fails()) {
@@ -175,7 +175,7 @@ class Main extends Controller
             ]);
             $data = User::where('id',$user->id)->first();
 
-            $credentials['email']    = $request->email;
+            $credentials['phone']    = $request->phone;
             $credentials['password']    = $request->password;
 
             try {

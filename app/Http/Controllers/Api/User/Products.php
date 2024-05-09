@@ -213,6 +213,55 @@ class Products extends Controller
          }
     }
 
+    public function edit_product_first_step(Request $request)
+    {
+        $validator_a = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:product,id',
+            'title' => 'required',
+            'description' => 'required',
+        ]);
+        if ($validator_a->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => $validator_a->errors(),
+            ], 401);
+        }
+
+
+        // Generate slug from title
+        $slug = Str::slug($request->title);
+        $make_sure = Product::where('slug', $slug)->first();
+        if ($make_sure) {
+            $slug = $slug . '-' . Str::random(9);
+        }
+
+        $product = Product::find($request->product_id);
+        $product->title = $request->title;
+        $product->slug = $slug;
+        $product->description = $request->description;
+        $product_id = $product->id;
+        $product->save();
+        // Video
+        if ($request->hasfile('video')) {
+            foreach ($request->file('video') as $key => $value) {
+                $video = $value;
+                $videoName = Str::random(9) . '-' . Str::uuid() . time() . '.' . $video->getClientOriginalExtension();
+                $video->storeAs('ads_videos', $videoName, 'public');
+                Video::create([
+                    'product_id' => $product->id,
+                    'src' => env('APP_URL')."storage/ads_videos/{$videoName}",
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Product details added successfully!',
+            'product_id' => $product_id,
+        ], 200);
+    }
+
     public function upload_image(Request $request)
     {
         $validator_a = Validator::make($request->all(), [
