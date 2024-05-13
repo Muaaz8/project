@@ -46,6 +46,8 @@ class MakeOfferController extends Controller
         $ch_input['message'] = $sender->name." made an offer ".$request->offer_price." for your listed product ".$prod->name;
         $ch_input['status'] = "sent";
         $ch_input['conversation_id'] = $conversation_id;
+        $ch_input['offer_id'] = $offer->id;
+        $ch_input['product_id'] = $request->product_id;
         $msg = Ch::Create($ch_input);
         $noti_text = $sender->name." made an offer for your listed product.";
         $notification['user_id'] = $receiver->id;

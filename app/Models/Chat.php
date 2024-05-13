@@ -19,7 +19,17 @@ class Chat extends Model
         'file_type',
         'status',
         'conversation_id',
+        'offer_id',
+        'product_id',
         'created_at',
         'updated_at',
     ];
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
+
+    public function offer(){
+        return $this->belongsTo(MakeOffer::class);
+    }
 }

@@ -569,4 +569,19 @@ class Products extends Controller
 
         return $this->sendResponse($prod,'Product View Increased Successfully.');
     }
+
+    public function delete_photo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'product_id' => 'required|exists:product,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(),[],401);
+        }
+
+        $photo = Photo::find($request->id)->delete();
+
+        return $this->sendResponse([],'Photo Deleted Successfully.');
+    }
 }

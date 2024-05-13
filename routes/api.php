@@ -66,6 +66,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/edit-product-third-step', [Products::class,'third_step']);
     Route::post('/edit-product-last-step', [Products::class,'last_step']);
     Route::post('/upload-image', [Products::class,'upload_image']);
+    Route::post('/delete-image', [Products::class,'delete_photo']);
 
     // Chatting Routes
     Route::middleware(['blockeduser'])->group(function () {

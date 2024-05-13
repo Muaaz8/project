@@ -227,8 +227,8 @@ class Chat extends Controller
 
     public function get_conversation($conversation_id)
     {
-        $conversation = Ch::where('conversation_id',$conversation_id)->get();
-        $msg = Ch::where('conversation_id',$conversation_id)->first();
+        $conversation = Ch::with(['product','offer','product.category','product.sub_category','product.photo','product.video','product.wishlist'])->where('conversation_id',$conversation_id)->get();
+        $msg = Ch::with(['product','offer','product.category','product.sub_category','product.photo','product.video','product.wishlist'])->where('conversation_id',$conversation_id)->first();
         $user1 = User::find($msg->sender_id);
         $user2 = User::find($msg->receiver_id);
         $data['conversation'] = $conversation;
