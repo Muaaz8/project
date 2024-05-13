@@ -25,7 +25,7 @@ class Profile extends Controller
 
     public function user_info($id)
     {
-        $user = User::find($id);
+        $user = User::with(['products','products.user','products.category','products.sub_category','products.photo','products.wishlist'])->find($id);
         return $this->sendResponse($user,'User Retrived Successfully.');
     }
 
