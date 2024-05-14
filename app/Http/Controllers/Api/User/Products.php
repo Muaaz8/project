@@ -580,8 +580,12 @@ class Products extends Controller
             return $this->sendError($validator->errors(),[],401);
         }
 
-        $photo = Photo::find($request->id)->delete();
-
-        return $this->sendResponse([],'Photo Deleted Successfully.');
+        $photo = Photo::find($request->id);
+        if($photo){
+            $photo->delete();
+            return $this->sendResponse([],'Photo Deleted Successfully.');
+        }else{
+            return $this->sendResponse([],'Image with requested Id does not exist.');
+        }
     }
 }
