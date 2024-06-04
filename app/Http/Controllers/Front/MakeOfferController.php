@@ -91,9 +91,8 @@ class MakeOfferController extends Controller
         $offer = MakeOffer::where('product_id',$request->product_id)
             ->where('seller_id',$request->seller_id)
             ->where('buyer_id',$request->buyer_id)
-            ->where('status','1')
             ->first();
-        $offer->status = 0;
+        $offer->status = 1;
         $offer->save();
         $conversation = Ch::where('sender_id',$request->buyer_id)->where('receiver_id',$request->seller_id)->first();
         $conversation1 = Ch::where('receiver_id',$request->buyer_id)->where('sender_id',$request->seller_id)->first();

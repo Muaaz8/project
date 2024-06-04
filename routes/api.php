@@ -13,6 +13,10 @@ use App\Http\Controllers\Front\MakeOfferController;
 use App\Http\Controllers\Api\User\WishlistController;
 use App\Http\Controllers\Api\User\Profile;
 use App\Http\Controllers\Api\User\Payment;
+
+use App\Http\Controllers\Api\Admin\CategoryA;
+use App\Http\Controllers\Api\Admin\UserA;
+use App\Http\Controllers\Api\Admin\ProductA;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -125,5 +129,20 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/block-a-user',[Profile::class,'block_user']);
     Route::post('/unblock-a-user',[Profile::class,'unblock_user']);
     Route::get('/list-block-a-user',[Profile::class,'list_blocked_user']);
+    
+    Route::get('/get-payment-status',[Profile::class,'list_blocked_user']);
+    Route::get('/list-block-a-user',[Profile::class,'list_blocked_user']);
 
+    
+    
 });
+
+Route::get('/payment-status',[Profile::class,'payment_status']);
+Route::get('/payment-fee',[Profile::class,'payment_fee']);
+
+// Admin Apis
+Route::post('/admin/upload/settings',[UserA::class,'upload_setting']);
+Route::post('/admin/add-category',[CategoryA::class, 'add_category']);
+Route::post('/admin/update-category',[CategoryA::class, 'edit_category']);
+Route::post('/admin/update-user-data',[UserA::class, 'update_user']);
+Route::post('/admin/update-product',[ProductA::class, 'update_product']);
