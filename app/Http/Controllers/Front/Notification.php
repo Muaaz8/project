@@ -5,9 +5,47 @@ namespace App\Http\Controllers\Front;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Notification as Nt;
+use Illuminate\Support\Facades\Validator;
 
 class Notification extends Controller
 {
+    public function firebase_notification($id,$data)
+    {
+        $app = "Notifications";
+        // Get a reference to the database
+        $firebase = (new \Kreait\Firebase\Factory)
+        ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
+        ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+        // Get a reference to the "users" node
+        $database = $firebase->createDatabase();
+        $blogRef = $database->getReference($app);
+        $data['date'] = date('m-d-Y');
+        $data['time'] = date('h:i A');
+        $blogRef->getChild($id)->set($data);
+    }
+
+    public function create(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'           => 'required|exists:users,id',
+            'text'              => 'required',
+            'type'              => 'required',
+            'type_id'           => 'required',
+            'status'            => 'required',
+        ]);
+
+        $data = $request->all();
+        $notif = Nt::create($data);
+        if($notif){
+            $this->firebase_notification($request->user_id,$notif);
+            return $this->sendResponse($data,'Notification Created Successfully.');
+        }else{
+            return $this->sendError('Notification is not created');
+        }
+
+
+    }
+
     public function get_user_all_notifications($id)
     {
         $type = request('type');

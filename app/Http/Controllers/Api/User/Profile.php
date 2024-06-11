@@ -274,6 +274,11 @@ class Profile extends Controller
         return $this->sendResponse($report,'Reported Users Retrived Successfully.');
     }
 
+    public function list_one_reported_user($id){
+        $report = ReportUsers::with(['reporter','reported'])->where('reported_user_id',$id)->get();
+        return $this->sendResponse($report,'User all reports Retrived Successfully.');
+    }
+
     public function block_user(Request $request){
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
@@ -380,6 +385,11 @@ class Profile extends Controller
                 'msg' => 'User Does not exist.',
             ], 401);
         }
+    }
+
+    public function get_all_users_reports()
+    {
+
     }
 
 }

@@ -52,6 +52,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/update/custom/link',[Profile::class, 'update_custom_link'])->name('update_custom_link');
     Route::post('/verify-email',[Profile::class, 'verify_email'])->name('verify_email');
     Route::post('/verify-email-otp',[Profile::class, 'verify_email_otp'])->name('verify_email_otp');
+    Route::get('/get/all/users/reports',[Profile::class, 'get_all_users_reports'])->name('get_all_users_reports');
 
     // Listing Products Routes
     Route::post('/categories', [Category::class,'index']);
@@ -83,6 +84,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/delete/conversation/{conversation_id}', [Chat::class, 'delete_conversation'])->name('delete_conversation');
 
     //Notification Routes
+    Route::post('/create/notification',[Notification::class, 'create'])->name('create_notification');
     Route::get('/get/user/all/notifications/{id}',[Notification::class, 'get_user_all_notifications'])->name('get_user_all_notifications');
     Route::get('/get/user/unread/notifications/{id}',[Notification::class, 'get_user_unread_notifications'])->name('get_user_unread_notifications');
     Route::get('/get/user/read/notifications/{id}',[Notification::class, 'get_user_read_notifications'])->name('get_user_read_notifications');
@@ -125,6 +127,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     Route::post('/report-a-user',[Profile::class,'report_user']);
     Route::get('/list-report-a-user',[Profile::class,'list_reported_user']);
+    Route::get('/list-report-user/{id}',[Profile::class,'list_one_reported_user']);
 
     Route::post('/block-a-user',[Profile::class,'block_user']);
     Route::post('/unblock-a-user',[Profile::class,'unblock_user']);
